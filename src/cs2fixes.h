@@ -25,7 +25,6 @@
 #include "igameevents.h"
 #include "networksystem/inetworkserializer.h"
 #include "public/ics2fixes.h"
-#include "steam/isteamhttp.h"
 #include <ISmmPlugin.h>
 #include <iplayerinfo.h>
 #include <iserver.h>
@@ -110,10 +109,6 @@ public: // hooks
 
 public: // MetaMod API
 	void* OnMetamodQuery(const char* iface, int* ret);
-	std::uint64_t GetAdminFlags(std::uint64_t iSteam64ID) const override;
-	bool SetAdminFlags(std::uint64_t iSteam64ID, std::uint64_t iFlags) override;
-	int GetAdminImmunity(std::uint64_t iSteam64ID) const override;
-	bool SetAdminImmunity(std::uint64_t iSteam64ID, std::uint32_t iImmunity) override;
 
 public:
 	const char* GetAuthor() { return PLUGIN_AUTHOR; }

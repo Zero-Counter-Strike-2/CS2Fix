@@ -18,16 +18,15 @@
  */
 
 #pragma once
-#include "adminsystem.h"
 #include "convar.h"
 #include "entity/ccsplayercontroller.h"
-#include "leader.h"
 #include <vector>
+
+#define ADMFLAG_NONE 0
 
 class CChatCommand;
 
 extern CConVar<bool> g_cvarEnableCommands;
-extern CConVar<bool> g_cvarEnableAdminCommands;
 extern std::map<uint32, std::shared_ptr<CChatCommand>>& CommandList();
 extern CConVar<bool> g_cvarEnableStopSound;
 extern CConVar<bool> g_cvarEnableNoShake;
@@ -66,10 +65,6 @@ public:
 	{
 		// Server disabled ALL chat commands
 		if (!g_cvarEnableCommands.Get())
-			return;
-
-		// Server disabled admin chat commands
-		if (!g_cvarEnableAdminCommands.Get() && m_nAdminFlags > ADMFLAG_NONE)
 			return;
 
 		// Only allow connected players to run chat commands
@@ -120,7 +115,6 @@ void ParseChatCommand(const char*, CCSPlayerController*);
 	void name##_callback(const CCommand& args, CCSPlayerController* player)
 
 #define CON_COMMAND_CHAT(name, description) CON_COMMAND_CHAT_FLAGS(name, description, ADMFLAG_NONE)
-#define CON_COMMAND_CHAT_LEADER(name, description) CON_COMMAND_CHAT_FLAGS(name, description, FLAG_LEADER)
 
 class CLoggingListener : public ILoggingListener
 {

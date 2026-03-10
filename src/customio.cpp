@@ -24,6 +24,7 @@
 #include "entity/ccsplayercontroller.h"
 #include "entity/cenventitymaker.h"
 #include "entity/clogiccase.h"
+#include "entity/cparticlesystem.h"
 #include "entity/cphysthruster.h"
 #include "entity/cpointhurt.h"
 

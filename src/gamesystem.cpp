@@ -19,17 +19,15 @@
 
 #include "gamesystem.h"
 #include "addresses.h"
-#include "adminsystem.h"
 #include "common.h"
+#include "cs2fixes.h"
 #include "customio.h"
 #include "entities.h"
 #include "entity/cgamerules.h"
 #include "gameconfig.h"
-#include "idlemanager.h"
-#include "leader.h"
 #include "playermanager.h"
+#include "serversideclient.h"
 #include "tier0/vprof.h"
-#include "zombiereborn.h"
 
 #include "tier0/memdbgon.h"
 
@@ -159,10 +157,6 @@ GS_EVENT_MEMBER(CGameSystem, BuildGameSessionManifest)
 	// Any resource adding MUST be done here, the resource manifest is not long-lived
 	// pResourceManifest->AddResource("characters/models/my_character_model.vmdl");
 
-	ZR_Precache(pResourceManifest);
-	PrecacheBeaconParticle(pResourceManifest);
-	Leader_Precache(pResourceManifest);
-
 	pResourceManifest->AddResource(g_cvarBurnParticle.Get().String());
 }
 
@@ -170,18 +164,15 @@ GS_EVENT_MEMBER(CGameSystem, BuildGameSessionManifest)
 GS_EVENT_MEMBER(CGameSystem, ServerPreEntityThink)
 {
 	VPROF_BUDGET("CGameSystem::ServerPreEntityThink", "CS2FixesPerFrame")
-	g_playerManager->FlashLightThink();
-	g_pIdleSystem->UpdateIdleTimes();
 
 	if (GetGlobals())
 		EntityHandler_OnGameFramePre(GetGlobals()->m_bInSimulation, GetGlobals()->tickcount);
 }
 
 // Called every frame after entities think
-GS_EVENT_MEMBER(CGameSystem, ServerPostEntityThink)
-{
+GS_EVENT_MEMBER(CGameSystem, ServerPostEntityThink){
 	VPROF_BUDGET("CGameSystem::ServerPostEntityThink", "CS2FixesPerFrame")
-	g_playerManager->UpdatePlayerStates();
+
 }
 
 GS_EVENT_MEMBER(CGameSystem, GameShutdown)

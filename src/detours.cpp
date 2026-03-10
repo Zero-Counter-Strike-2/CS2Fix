@@ -22,7 +22,6 @@
 #include "usercmd.pb.h"
 
 #include "addresses.h"
-#include "buttonwatch.h"
 #include "cdetour.h"
 #include "commands.h"
 #include "common.h"
@@ -40,17 +39,14 @@
 #include "entity/ctakedamageinfo.h"
 #include "entity/ctriggerpush.h"
 #include "entity/services.h"
-#include "entwatch.h"
 #include "gameconfig.h"
 #include "igameevents.h"
 #include "irecipientfilter.h"
-#include "map_votes.h"
 #include "module.h"
 #include "networksystem/inetworkserializer.h"
 #include "playermanager.h"
 #include "serversideclient.h"
 #include "tier0/vprof.h"
-#include "zombiereborn.h"
 
 #include "tier0/memdbgon.h"
 
@@ -155,9 +151,6 @@ int64 FASTCALL Detour_CBaseEntity_TakeDamageOld(CBaseEntity* pThis, CTakeDamageI
 
 	CBaseEntity_TakeDamageOld(pThis, pInfo, pResult);
 
-	if (pResult->m_nDamageDealt > 0 && !pResult->m_bWasDamageSuppressed && g_cvarEnableZR.Get() && pThis->IsPawn())
-		ZR_OnPlayerTakeDamage(reinterpret_cast<CCSPlayerPawn*>(pThis), pInfo, pResult->m_nDamageDealt);
-
 	return 1;
 }
 
@@ -240,10 +233,6 @@ void FASTCALL Detour_TriggerPush_Touch(CTriggerPush* pPush, CBaseEntity* pOther)
 
 bool FASTCALL Detour_IsHearingClient(void* serverClient, int index)
 {
-	ZEPlayer* player = g_playerManager->GetPlayer(index);
-	if (player && player->IsMuted())
-		return false;
-
 	return IsHearingClient(serverClient, index);
 }
 
@@ -391,26 +380,17 @@ void FASTCALL Detour_UTIL_SayText2Filter(
 
 bool FASTCALL Detour_CCSPlayer_WeaponServices_CanUse(CCSPlayer_WeaponServices* pWeaponServices, CBasePlayerWeapon* pPlayerWeapon)
 {
-	if (g_cvarEnableEntWatch.Get() && !EW_Detour_CCSPlayer_WeaponServices_CanUse(pWeaponServices, pPlayerWeapon))
-		return false;
-
 	return CCSPlayer_WeaponServices_CanUse(pWeaponServices, pPlayerWeapon);
 }
 
 void FASTCALL Detour_CCSPlayer_WeaponServices_EquipWeapon(CCSPlayer_WeaponServices* pWeaponServices, CBasePlayerWeapon* pPlayerWeapon)
 {
-	if (g_cvarEnableEntWatch.Get())
-		EW_Detour_CCSPlayer_WeaponServices_EquipWeapon(pWeaponServices, pPlayerWeapon);
-
 	return CCSPlayer_WeaponServices_EquipWeapon(pWeaponServices, pPlayerWeapon);
 }
 
 bool FASTCALL Detour_CEntityIdentity_AcceptInput(CEntityIdentity* pThis, CUtlSymbolLarge* pInputName, CEntityInstance* pActivator, CEntityInstance* pCaller, variant_t* value, int nOutputID, void* a7, void* a8)
 {
 	VPROF_SCOPE_BEGIN("Detour_CEntityIdentity_AcceptInput");
-
-	if (g_cvarEnableZR.Get())
-		ZR_Detour_CEntityIdentity_AcceptInput(pThis, pInputName, pActivator, pCaller, value, nOutputID);
 
 	// Handle KeyValue(s)
 	if (!V_strnicmp(pInputName->String(), "KeyValue", 8))
@@ -804,14 +784,6 @@ void FASTCALL Detour_GameSystem_Think_CheckSteamBan()
 
 AcquireResult FASTCALL Detour_CCSPlayer_ItemServices_CanAcquire(CCSPlayer_ItemServices* pItemServices, CEconItemView* pEconItem, AcquireMethod iAcquireMethod, uint64_t unk4)
 {
-	if (g_cvarEnableZR.Get())
-	{
-		AcquireResult zrResult = ZR_Detour_CCSPlayer_ItemServices_CanAcquire(pItemServices, pEconItem);
-
-		if (zrResult != AcquireResult::Allowed)
-			return zrResult;
-	}
-
 	return CCSPlayer_ItemServices_CanAcquire(pItemServices, pEconItem, iAcquireMethod, unk4);
 }
 

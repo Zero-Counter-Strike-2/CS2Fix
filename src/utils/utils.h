@@ -36,4 +36,3 @@ uint32 GetSoundEventHash(const char* pszSoundEventName);
 std::string StringToLower(std::string strValue);
 
 ISteamUGC* GetSteamUGC();
-ISteamHTTP* GetSteamHTTP();

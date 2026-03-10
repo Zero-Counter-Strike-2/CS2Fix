@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "../entwatch.h"
+#include "../../ctimer.h"
 #include "cbaseentity.h"
 #include "cbasemodelentity.h"
 #include "services.h"
@@ -81,16 +81,7 @@ public:
 	{
 		// CommitSuicide doesn't go through OnTakeDamage_Alive
 		if (g_cvarDropMapWeapons.Get())
-		{
-			if (g_cvarEnableEntWatch.Get())
-			{
-				CCSPlayerController* pController = reinterpret_cast<CCSPlayerController*>(m_hController().Get());
-				if (pController)
-					EW_PlayerDeathPre(pController);
-			}
-
 			DropMapWeapons();
-		}
 
 		static int offset = g_GameConfig->GetOffset("CBasePlayerPawn_CommitSuicide");
 		CALL_VIRTUAL(void, offset, this, bExplode, bForce);

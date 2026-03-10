@@ -20,24 +20,18 @@
 #include "KeyValues.h"
 #include "commands.h"
 #include "common.h"
+#include "cs2fixes.h"
 #include "ctimer.h"
 #include "entities.h"
+#include "entity.h"
 #include "entity/cbaseplayercontroller.h"
 #include "entity/cgamerules.h"
-#include "entwatch.h"
 #include "eventlistener.h"
-#include "hud_manager.h"
-#include "idlemanager.h"
-#include "leader.h"
-#include "map_votes.h"
-#include "mapmigrations.h"
-#include "panoramavote.h"
 #include "recipientfilters.h"
-#include "topdefender.h"
-#include "votemanager.h"
-#include "zombiereborn.h"
 
 #include "tier0/memdbgon.h"
+
+static CConVar<bool> g_cvarFixHudFlashing("cs2f_fix_hud_flashing", FCVAR_NONE, "Whether to fix the HUD flashing after round end", false);
 
 CUtlVector<CGameEventListener*> g_vecEventListeners;
 
@@ -80,14 +74,6 @@ GAME_EVENT_F(round_prestart)
 	// Prevent shakes carrying over from previous rounds
 	while ((pShake = UTIL_FindEntityByClassname(pShake, "env_shake")))
 		pShake->AcceptInput("StopShake");
-
-	if (g_cvarEnableZR.Get())
-		ZR_OnRoundPrestart(pEvent);
-
-	if (g_cvarEnableEntWatch.Get())
-		EW_RoundPreStart();
-
-	g_pMapMigrations->OnRoundPrestart();
 }
 
 CConVar<bool> g_cvarBlockTeamMessages("cs2f_block_team_messages", FCVAR_NONE, "Whether to block team join messages", false);
@@ -114,9 +100,6 @@ GAME_EVENT_F(player_spawn)
 	// always reset when player spawns
 	if (pPlayer)
 		pPlayer->SetMaxSpeed(1.f);
-
-	if (g_cvarEnableZR.Get())
-		ZR_OnPlayerSpawn(pController);
 
 	if (pController->IsConnected())
 		pController->GetZEPlayer()->OnSpawn();
@@ -166,34 +149,16 @@ GAME_EVENT_F(player_spawn)
 
 GAME_EVENT_F(player_hurt)
 {
-	if (g_cvarEnableTopDefender.Get())
-		TD_OnPlayerHurt(pEvent);
 }
 
 GAME_EVENT_F(player_death)
 {
-	if (g_cvarEnableZR.Get())
-		ZR_OnPlayerDeath(pEvent);
-
-	if (g_cvarEnableEntWatch.Get())
-		EW_PlayerDeath(pEvent);
-
-	if (g_cvarEnableTopDefender.Get())
-		TD_OnPlayerDeath(pEvent);
 }
 
 CConVar<bool> g_cvarFullAllTalk("cs2f_full_alltalk", FCVAR_NONE, "Whether to enforce sv_full_alltalk 1", false);
 
 GAME_EVENT_F(round_start)
 {
-	g_pPanoramaVoteHandler->Init();
-
-	if (g_cvarEnableZR.Get())
-		ZR_OnRoundStart(pEvent);
-
-	if (g_cvarEnableLeader.Get())
-		Leader_OnRoundStart(pEvent);
-
 	// Dumb workaround for CS2 always overriding sv_full_alltalk on state changes
 	if (g_cvarFullAllTalk.Get())
 		g_pEngineServer2->ServerCommand("sv_full_alltalk 1");
@@ -201,47 +166,30 @@ GAME_EVENT_F(round_start)
 	// Ensure there's no warmup, because mp_warmup_online_enabled gets randomly ignored for some reason, this is a problem with cs2f_fix_hud_flashing
 	if (g_cvarFixHudFlashing.Get() && g_pGameRules && g_pGameRules->m_bWarmupPeriod)
 		g_pEngineServer2->ServerCommand("mp_warmup_end");
-
-	if (g_cvarEnableTopDefender.Get())
-		TD_OnRoundStart(pEvent);
 }
 
 GAME_EVENT_F(round_end)
 {
 	if (g_cvarFixHudFlashing.Get() && g_pGameRules)
 		g_pGameRules->m_bGameRestart = false;
-
-	if (g_cvarEnableTopDefender.Get())
-		TD_OnRoundEnd(pEvent);
 }
 
 GAME_EVENT_F(round_freeze_end)
 {
-	if (g_cvarEnableZR.Get())
-		ZR_OnRoundFreezeEnd(pEvent);
 }
 
 GAME_EVENT_F(round_time_warning)
 {
-	if (g_cvarEnableZR.Get())
-		ZR_OnRoundTimeWarning(pEvent);
 }
 
 GAME_EVENT_F(bullet_impact)
 {
-	if (g_cvarEnableLeader.Get())
-		Leader_BulletImpact(pEvent);
 }
 
 GAME_EVENT_F(vote_cast)
 {
-	g_pPanoramaVoteHandler->VoteCast(pEvent);
 }
 
 GAME_EVENT_F(cs_win_panel_match)
 {
-	g_pIdleSystem->PauseIdleChecks();
-
-	if (!g_pMapVoteSystem->IsVoteOngoing())
-		g_pMapVoteSystem->StartVote();
 }

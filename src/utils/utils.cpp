@@ -87,10 +87,3 @@ ISteamUGC* GetSteamUGC()
 		return SteamUGC();
 }
 
-ISteamHTTP* GetSteamHTTP()
-{
-	if (g_pEngineServer2->IsDedicatedServer())
-		return SteamGameServerHTTP();
-	else
-		return SteamHTTP();
-}
