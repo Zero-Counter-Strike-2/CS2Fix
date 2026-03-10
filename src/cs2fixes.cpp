@@ -121,6 +121,26 @@ CGlobalVars* GetGlobals()
 	return g_pEngineServer2->GetServerGlobals();
 }
 
+std::uint64_t CS2Fixes::GetAdminFlags(std::uint64_t) const
+{
+	return 0;
+}
+
+bool CS2Fixes::SetAdminFlags(std::uint64_t, std::uint64_t)
+{
+	return false;
+}
+
+int CS2Fixes::GetAdminImmunity(std::uint64_t) const
+{
+	return 0;
+}
+
+bool CS2Fixes::SetAdminImmunity(std::uint64_t, std::uint32_t)
+{
+	return false;
+}
+
 PLUGIN_EXPOSE(CS2Fixes, g_CS2Fixes);
 bool CS2Fixes::Load(PluginId id, ISmmAPI* ismm, char* error, size_t maxlen, bool late)
 {

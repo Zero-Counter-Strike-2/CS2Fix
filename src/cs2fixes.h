@@ -119,6 +119,10 @@ public:
 	const char* GetVersion() { return PLUGIN_FULL_VERSION; }
 	const char* GetDate() { return __DATE__; }
 	const char* GetLogTag() { return PLUGIN_LOGTAG; }
+	std::uint64_t GetAdminFlags(std::uint64_t iSteam64ID) const override;
+	bool SetAdminFlags(std::uint64_t iSteam64ID, std::uint64_t iFlags) override;
+	int GetAdminImmunity(std::uint64_t iSteam64ID) const override;
+	bool SetAdminImmunity(std::uint64_t iSteam64ID, std::uint32_t iImmunity) override;
 };
 
 extern CS2Fixes g_CS2Fixes;
