@@ -34,8 +34,6 @@ public:
 	SCHEMA_FIELD(float, m_flDissolveStartTime)
 	SCHEMA_FIELD(Vector, m_vecViewOffset)
 
-	void SetModel(const char* szModel);
-
 	void SetCollisionGroup(StandardCollisionGroups_t nCollisionGroup)
 	{
 		m_Collision().m_CollisionGroup = static_cast<uint8>(nCollisionGroup);

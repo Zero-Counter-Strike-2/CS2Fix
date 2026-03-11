@@ -18,12 +18,3 @@
  */
 
 #include "cbasemodelentity.h"
-#include "ccsplayerpawn.h"
-
-void CBaseModelEntity::SetModel(const char* szModel)
-{
-	addresses::CBaseModelEntity_SetModel(this, szModel);
-
-	if (IsPawn())
-		((CCSPlayerPawn*)this)->FixPlayerModelAnimations();
-}
